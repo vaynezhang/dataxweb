@@ -12,6 +12,7 @@ import com.alibaba.datax.common.element.DoubleColumn;
 import com.alibaba.datax.common.element.LongColumn;
 import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.element.StringColumn;
+import com.alibaba.datax.common.element.BytesColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordSender;
 import com.alibaba.datax.common.spi.Reader;
@@ -24,11 +25,14 @@ import com.alibaba.fastjson2.JSONObject;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.mongodb.MongoClient;
+//import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 
 /**
@@ -162,6 +166,10 @@ public class MongoDBReader extends Reader {
                         record.addColumn(new LongColumn((Integer) tempCol));
                     }else if (tempCol instanceof Long) {
                         record.addColumn(new LongColumn((Long) tempCol));
+                    }else if (tempCol instanceof Binary) {
+                        Binary binaryData = (Binary) tempCol;
+                        byte[] binaryBytes = binaryData.getData();
+                        record.addColumn(new BytesColumn(binaryBytes));
                     } else {
                         if(KeyConstant.isArrayType(column.getString(KeyConstant.COLUMN_TYPE))) {
                             String splitter = column.getString(KeyConstant.COLUMN_SPLITTER);

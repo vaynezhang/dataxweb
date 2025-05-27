@@ -1,25 +1,22 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import codecs
-import json
-import os
-import platform
-import re
-import signal
-import socket
-import subprocess
 import sys
+import os
+import signal
+import subprocess
 import time
-from optparse import OptionGroup
+import re
+import socket
+import json
 from optparse import OptionParser
+from optparse import OptionGroup
 from string import Template
-
-ispy2 = sys.version_info.major == 2
+import codecs
+import platform
 
 def isWindows():
     return platform.system() == 'Windows'
-
 
 DATAX_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -55,19 +52,13 @@ def getLocalIp():
 
 def suicide(signum, e):
     global child_process
-    if ispy2:
-        print >> sys.stderr, "[Error] DataX receive unexpected signal %d, starts to suicide." % (signum)
-    else:
-        print("[Error] DataX receive unexpected signal %d, starts to suicide." % (signum), sys.stderr)
+    print >> sys.stderr, "[Error] DataX receive unexpected signal %d, starts to suicide." % (signum)
 
     if child_process:
         child_process.send_signal(signal.SIGQUIT)
         time.sleep(1)
         child_process.kill()
-    if ispy2:
-        print >> sys.stderr, "DataX Process was killed ! you did ?"
-    else:
-        print("DataX Process was killed ! you did ?", sys.stderr)
+    print >> sys.stderr, "DataX Process was killed ! you did ?"
     sys.exit(RET_STATE["KILL"])
 
 
@@ -101,10 +92,10 @@ def getOptionParser():
                                        'if you have mutiple parameters: -p"-DtableName=your-table-name -DcolumnName=your-column-name".'
                                        'Note: you should config in you job tableName with ${tableName}.')
     prodEnvOptionGroup.add_option("-r", "--reader", metavar="<parameter used in view job config[reader] template>",
-                                  action="store", dest="reader", type="string",
+                                  action="store", dest="reader",type="string",
                                   help='View job config[reader] template, eg: mysqlreader,streamreader')
     prodEnvOptionGroup.add_option("-w", "--writer", metavar="<parameter used in view job config[writer] template>",
-                                  action="store", dest="writer", type="string",
+                                  action="store", dest="writer",type="string",
                                   help='View job config[writer] template, eg: mysqlwriter,streamwriter')
     parser.add_option_group(prodEnvOptionGroup)
 
@@ -117,50 +108,45 @@ def getOptionParser():
     parser.add_option_group(devEnvOptionGroup)
     return parser
 
-
 def generateJobConfigTemplate(reader, writer):
-    readerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n" % (
-        reader, reader, reader)
-    writerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n " % (
-        writer, writer, writer)
+    readerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n" % (reader,reader,reader)
+    writerRef = "Please refer to the %s document:\n     https://github.com/alibaba/DataX/blob/master/%s/doc/%s.md \n " % (writer,writer,writer)
     print(readerRef)
     print(writerRef)
     jobGuid = 'Please save the following configuration as a json file and  use\n     python {DATAX_HOME}/bin/datax.py {JSON_FILE_NAME}.json \nto run the job.\n'
     print(jobGuid)
-    jobTemplate = {
-        "job": {
-            "setting": {
-                "speed": {
-                    "channel": ""
-                }
-            },
-            "content": [
-                {
-                    "reader": {},
-                    "writer": {}
-                }
-            ]
-        }
+    jobTemplate={
+      "job": {
+        "setting": {
+          "speed": {
+            "channel": ""
+          }
+        },
+        "content": [
+          {
+            "reader": {},
+            "writer": {}
+          }
+        ]
+      }
     }
-    readerTemplatePath = "%s/plugin/reader/%s/plugin_job_template.json" % (DATAX_HOME, reader)
-    writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (DATAX_HOME, writer)
+    readerTemplatePath = "%s/plugin/reader/%s/plugin_job_template.json" % (DATAX_HOME,reader)
+    writerTemplatePath = "%s/plugin/writer/%s/plugin_job_template.json" % (DATAX_HOME,writer)
     try:
-        readerPar = readPluginTemplate(readerTemplatePath)
-    except:
-        print("Read reader[%s] template error: can\'t find file %s" % (reader, readerTemplatePath))
+      readerPar = readPluginTemplate(readerTemplatePath);
+    except Exception as e:
+       print("Read reader[%s] template error: can\'t find file %s" % (reader,readerTemplatePath))
     try:
-        writerPar = readPluginTemplate(writerTemplatePath)
-    except:
-        print("Read writer[%s] template error: : can\'t find file %s" % (writer, writerTemplatePath))
-    jobTemplate['job']['content'][0]['reader'] = readerPar
-    jobTemplate['job']['content'][0]['writer'] = writerPar
+      writerPar = readPluginTemplate(writerTemplatePath);
+    except Exception as e:
+      print("Read writer[%s] template error: : can\'t find file %s" % (writer,writerTemplatePath))
+    jobTemplate['job']['content'][0]['reader'] = readerPar;
+    jobTemplate['job']['content'][0]['writer'] = writerPar;
     print(json.dumps(jobTemplate, indent=4, sort_keys=True))
-
 
 def readPluginTemplate(plugin):
     with open(plugin, 'r') as f:
-        return json.load(f)
-
+            return json.load(f)
 
 def isUrl(path):
     if not path:
@@ -225,7 +211,7 @@ if __name__ == "__main__":
     parser = getOptionParser()
     options, args = parser.parse_args(sys.argv[1:])
     if options.reader is not None and options.writer is not None:
-        generateJobConfigTemplate(options.reader, options.writer)
+        generateJobConfigTemplate(options.reader,options.writer)
         sys.exit(RET_STATE['OK'])
     if len(args) != 1:
         parser.print_help()

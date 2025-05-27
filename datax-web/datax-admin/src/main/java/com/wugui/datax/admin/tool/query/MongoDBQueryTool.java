@@ -2,13 +2,19 @@ package com.wugui.datax.admin.tool.query;
 
 
 import com.mongodb.*;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+
 import com.wugui.datax.admin.core.util.LocalCacheUtil;
 import com.wugui.datax.admin.entity.JobDatasource;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import java.util.function.Consumer;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -39,10 +45,21 @@ public class MongoDBQueryTool {
 
     private void getDataSource(JobDatasource jobDatasource) throws IOException {
         if (StringUtils.isBlank(jobDatasource.getJdbcUsername()) && StringUtils.isBlank(jobDatasource.getJdbcPassword())) {
-            connection = new MongoClient(new MongoClientURI(jobDatasource.getJdbcUrl()));
+            ConnectionString connStr = new ConnectionString(jobDatasource.getJdbcUrl());
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(connStr)
+                    .build();
+            connection = MongoClients.create(settings);
+            // connection = new MongoClient(new MongoClientURI(jobDatasource.getJdbcUrl()));
         } else {
             MongoCredential credential = MongoCredential.createCredential(jobDatasource.getJdbcUsername(), jobDatasource.getDatabaseName(), jobDatasource.getJdbcPassword().toCharArray());
-            connection = new MongoClient(parseServerAddress(jobDatasource.getJdbcUrl()), Arrays.asList(credential));
+            ConnectionString connStr = new ConnectionString(jobDatasource.getJdbcUrl());
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(connStr)
+                    .credential(credential)
+                    .build();
+            connection = MongoClients.create(settings);
+            // connection = new MongoClient(parseServerAddress(jobDatasource.getJdbcUrl()), Arrays.asList(credential));
         }
         collections = connection.getDatabase(jobDatasource.getDatabaseName());
     }
@@ -63,7 +80,7 @@ public class MongoDBQueryTool {
     public List<String> getDBNames() {
         MongoIterable<String> dbs = connection.listDatabaseNames();
         List<String> dbNames = new ArrayList<>();
-        dbs.forEach((Block<? super String>) dbNames::add);
+        dbs.forEach((Consumer<? super String>) dbNames::add);
         return dbNames;
     }
 
@@ -85,7 +102,7 @@ public class MongoDBQueryTool {
     public List<String> getCollectionNames(String dbName) {
         collections = connection.getDatabase(dbName);
         List<String> collectionNames = new ArrayList<>();
-        collections.listCollectionNames().forEach((Block<? super String>) collectionNames::add);
+        collections.listCollectionNames().forEach((Consumer<? super String>) collectionNames::add);
         return collectionNames;
     }
 

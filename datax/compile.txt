@@ -1,0 +1,11 @@
+基于centos8+java1.8编译
+
+改动：
+1、升级core/src/main/bin/中python脚本，支持python3.10
+2、新增ES8.x reader驱动支持，支持ES读取
+3、新增mongo-driver-sync-5.5.0驱动支持mongo6.x
+4、mongodb驱动和工具兼容性修改
+5、hdfsreader、oceanbasev10writer等等编译错误
+
+编译：
+mvn -U clean package assembly:assembly -Dmaven.test.skip=true

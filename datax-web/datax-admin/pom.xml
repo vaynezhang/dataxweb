@@ -767,10 +767,35 @@
             </exclusions>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>${mongo-java-driver.version}</version>
+        </dependency-->
+
+        <!--dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-driver-legacy</artifactId>
+            <version>${mongo-driver-legacy.version}</version>
+        </dependency-->
+
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>${mongo-driver-sync.version}</version>
+        </dependency>
+
+        <!-- BSON -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <version>${mongo-driver-sync.version}</version> <!-- 确保版本与 mongodb-driver-sync 一致 -->
+        </dependency>
+        <!-- MongoDB Driver Core -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-core</artifactId>
+            <version>${mongo-driver-sync.version}</version> <!-- 确保版本与 mongodb-driver-sync 一致 -->
         </dependency>
 
         <dependency>

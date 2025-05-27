@@ -21,7 +21,7 @@ public class DataXConstant {
 
     public static final String PARAMS_CM_V_PT = "-Dpartition=%s";
 
-    public static final String DEFAULT_JSON = "jsons";
+    public static final String DEFAULT_JSON = "json";
 
     public static final String DEFAULT_DATAX_PY = "datax.py";
 

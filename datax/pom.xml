@@ -73,6 +73,7 @@
         <module>streamreader</module>
         <module>clickhousereader</module>
 
+        <module>elasticsearchreader</module>
         <module>mongodbreader</module>
         <module>tdenginereader</module>
         <module>gdbreader</module>

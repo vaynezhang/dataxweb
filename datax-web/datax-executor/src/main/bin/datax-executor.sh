@@ -56,7 +56,7 @@ load_env(){
 }
 
 BIN=`abs_path`
-SHELL_LOG="${BIN}/console.out"
+SHELL_LOG="${BIN}/../logs/datax-executor.log"
 load_env
 
 #verify environment

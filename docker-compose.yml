@@ -1,0 +1,14 @@
+services:
+  datax:
+    container_name: datax-web   # 指定容器名称
+    image: datax-local:0.7
+    ports:
+      - "8090:9527"
+    environment:
+      - DB_HOST=192.168.10.215  # 设置环境变量
+      - DB_PORT=3306            # 设置环境变量
+      - DB_USERNAME=root        # 设置环境变量
+      - DB_PASSWORD=root_pswd   # 设置环境变量
+      - DB_DATABASE=dataxweb    # 设置环境变量
+    volumes:
+      - ./start.sh:/app/start.sh   # 设置启动脚本

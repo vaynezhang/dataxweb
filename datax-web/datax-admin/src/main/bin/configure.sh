@@ -164,39 +164,46 @@ if [ "x${SQL_SOURCE_PATH}" != "x" ] && [ -f "${SQL_SOURCE_PATH}" ]; then
    `mysql --version >/dev/null 2>&1`
    if [ $? == 0 ]; then
       LOG INFO "\033[1m Scan out mysql command, so begin to initalize the database\033[0m"
-      interact_echo "Do you want to initalize database with sql: [${SQL_SOURCE_PATH}]?"
-      if [ $? == 0 ]; then
-        read -p "Please input the db host(default: 127.0.0.1): " HOST
-        if [ "x${HOST}" == "x" ]; then
-          HOST="127.0.0.1"
-        fi
-        while [ 1 ]; do
-          read -p "Please input the db port(default: 3306): " PORT
-          if [ "x${PORT}" == "x" ]; then
-            PORT=3306
-            break
-          elif [ ${PORT} -gt 0 ] 2>/dev/null; then
-            break
-          else
-            echo "${PORT} is not a number, please input again"
+      HOST=${DB_HOST:-"127.0.0.1"}
+      PORT=${DB_PORT:-"3306"}
+      USERNAME=${DB_USERNAME:-"root"}
+      PASSWORD=${DB_PASSWORD:-""}
+      DATABASE=${DB_DATABASE:-"dataxweb"}
+      if [ ${FORCE_INSTALL} == false ]; then
+        interact_echo "Do you want to initalize database with sql: [${SQL_SOURCE_PATH}]?"
+        if [ $? == 0 ]; then
+          read -p "Please input the db host(default: 127.0.0.1): " HOST
+          if [ "x${HOST}" == "x" ]; then
+            HOST="127.0.0.1"
           fi
-        done
-        read -p "Please input the db username(default: root): " USERNAME
-        if [ "x${USERNAME}" == "x" ]; then
-          USERNAME="root"
+          while [ 1 ]; do
+            read -p "Please input the db port(default: 3306): " PORT
+            if [ "x${PORT}" == "x" ]; then
+              PORT=3306
+              break
+            elif [ ${PORT} -gt 0 ] 2>/dev/null; then
+              break
+            else
+              echo "${PORT} is not a number, please input again"
+            fi
+          done
+          read -p "Please input the db username(default: root): " USERNAME
+          if [ "x${USERNAME}" == "x" ]; then
+            USERNAME="root"
+          fi
+          read -p "Please input the db password(default: ""): " PASSWORD
+          read -p "Please input the db name(default: dataxweb)" DATABASE
+          if [ "x${DATABASE}" == "x" ]; then
+            DATABASE="dataxweb"
+          fi
         fi
-        read -p "Please input the db password(default: ""): " PASSWORD
-        read -p "Please input the db name(default: dataxweb)" DATABASE
-        if [ "x${DATABASE}" == "x" ]; then
-          DATABASE="dataxweb"
-        fi
-        mysql -h ${HOST} -P ${PORT} -u ${USERNAME} -p${PASSWORD}  --default-character-set=utf8 -e \
-        "CREATE DATABASE IF NOT EXISTS ${DATABASE}; USE ${DATABASE}; source ${SQL_SOURCE_PATH};"
-        sed -ri "s![#]?(DB_HOST=)\S*!\1${HOST}!g" ${BOOTSTRAP_PROP_FILE}
-        sed -ri "s![#]?(DB_PORT=)\S*!\1${PORT}!g" ${BOOTSTRAP_PROP_FILE}
-        sed -ri "s![#]?(DB_USERNAME=)\S*!\1${USERNAME}!g" ${BOOTSTRAP_PROP_FILE}
-        sed -ri "s![#]?(DB_PASSWORD=)\S*!\1${PASSWORD}!g" ${BOOTSTRAP_PROP_FILE}
-        sed -ri "s![#]?(DB_DATABASE=)\S*!\1${DATABASE}!g" ${BOOTSTRAP_PROP_FILE}
       fi
+      mysql -h ${HOST} -P ${PORT} -u ${USERNAME} -p${PASSWORD}  --default-character-set=utf8 -e \
+      "CREATE DATABASE IF NOT EXISTS ${DATABASE}; USE ${DATABASE}; source ${SQL_SOURCE_PATH};"
+      sed -ri "s![#]?(DB_HOST=)\S*!\1${HOST}!g" ${BOOTSTRAP_PROP_FILE}
+      sed -ri "s![#]?(DB_PORT=)\S*!\1${PORT}!g" ${BOOTSTRAP_PROP_FILE}
+      sed -ri "s![#]?(DB_USERNAME=)\S*!\1${USERNAME}!g" ${BOOTSTRAP_PROP_FILE}
+      sed -ri "s![#]?(DB_PASSWORD=)\S*!\1${PASSWORD}!g" ${BOOTSTRAP_PROP_FILE}
+      sed -ri "s![#]?(DB_DATABASE=)\S*!\1${DATABASE}!g" ${BOOTSTRAP_PROP_FILE}   
    fi
 fi

@@ -51,7 +51,8 @@ public class ExecutorJobHandler extends IJobHandler {
         tmpFilePath = generateTemJsonFile(trigger.getJobJson());
 
         try {
-            String[] cmdarrayFinal = buildDataXExecutorCmd(trigger, tmpFilePath,dataXPyPath);
+            String[] cmdarrayFinal = buildDataXExecutorCmd(trigger, tmpFilePath, dataXPyPath);
+            JobLogger.log("------------------DataX Executor Command: " + String.join(" ", cmdarrayFinal));
             final Process process = Runtime.getRuntime().exec(cmdarrayFinal);
             String prcsId = ProcessUtil.getProcessId(process);
             JobLogger.log("------------------DataX process id: " + prcsId);
@@ -87,7 +88,7 @@ public class ExecutorJobHandler extends IJobHandler {
             }
             //  删除临时文件
             if (FileUtil.exist(tmpFilePath)) {
-                FileUtil.del(new File(tmpFilePath));
+                // FileUtil.del(new File(tmpFilePath));
             }
         }
         if (exitValue == 0) {
@@ -108,7 +109,8 @@ public class ExecutorJobHandler extends IJobHandler {
         if (!FileUtil.exist(jsonPath)) {
             FileUtil.mkdir(jsonPath);
         }
-        tmpFilePath = jsonPath + "jobTmp-" + IdUtil.simpleUUID() + ".conf";
+        jsonPath = jsonPath.endsWith(File.separator) ? jsonPath : jsonPath.concat(File.separator);
+        tmpFilePath = jsonPath + "jobTmp-" + IdUtil.simpleUUID() + ".json";
         // 根据json写入到临时本地文件
         try (PrintWriter writer = new PrintWriter(tmpFilePath, "UTF-8")) {
             writer.println(jobJson);

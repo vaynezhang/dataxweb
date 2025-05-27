@@ -14,7 +14,7 @@ PACKAGE_DIR="${DIR}/../packages"
 
 MODULE_LIST=()
 CONF_FILE_PATH="bin/configure.sh"
-FORCE_INSTALL=false
+export FORCE_INSTALL=false
 SKIP_PACKAGE=false
 SAFE_MODE=true
 UNSAFE_COMMAND=""
@@ -175,7 +175,7 @@ while [ 1 ]; do
     shift 2
   ;;
   -f|--force)
-    FORCE_INSTALL=true
+    export FORCE_INSTALL=true
     shift 1
   ;;
   --skip-pack)
